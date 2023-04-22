@@ -43,12 +43,11 @@ if __name__ == "__main__":
             for f in files:
                 text = pa.sub(" ", open(f).read())
                 lines.append(text)
-            train_index = random.sample(range(len(lines)), int(len(lines) * 0.8))
-            rest_index = list(set(range(len(lines))) - set(train_index))
-            valid_index = random.sample(
-                range(len(rest_index)), int(len(rest_index) * 0.5)
-            )
-            test_index = list(set(range(len(rest_index))) - set(valid_index))
+            indexes = range(len(lines))
+            train_index = random.sample(indexes, int(len(lines) * 0.8))
+            rest_index = set(indexes) - set(train_index)
+            valid_index = random.sample(rest_index, int(len(rest_index) * 0.5))
+            test_index = list(rest_index - set(valid_index))
             # print(f"{'*' * 100}")
             # print(f"{train_index=}")
             # print(f"{valid_index=}")

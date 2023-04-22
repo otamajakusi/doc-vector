@@ -1,0 +1,6 @@
+torch
+sentence-transformers
+fugashi
+ipadic
+unidic-lite
+pandas
