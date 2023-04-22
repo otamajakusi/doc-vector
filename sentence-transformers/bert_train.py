@@ -38,7 +38,9 @@ def flat_precision_recall_fscore(preds, labels):
 
 
 # トレーニング関数
-def train(model, train_dataloader, validation_dataloader, test_dataloader, device):
+def train(
+    model, optimizer, train_dataloader, validation_dataloader, test_dataloader, device
+):
     # ベストなモデルを保存
     best_validation_loss = float("inf")
     best_model = None
@@ -236,7 +238,14 @@ def main(train_dataset, val_dataset, test_dataset):
         optimizer, num_warmup_steps=0, num_training_steps=total_steps
     )
 
-    train(model, train_dataloader, validation_dataloader, test_dataloader, device)
+    train(
+        model,
+        optimizer,
+        train_dataloader,
+        validation_dataloader,
+        test_dataloader,
+        device,
+    )
 
 
 if __name__ == "__main__":
