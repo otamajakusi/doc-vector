@@ -12,3 +12,5 @@ https://huggingface.co/docs/transformers/model_doc/bert-japanese
 https://www.softbanktech.co.jp/special/blog/dx_station/2021/0038?sid=special_blog_dx_station_2022_0032_txt01
 を参考に、文章の分類をしてみる
 
+
+https://github.com/nekoumei/DocumentClassificationUsingBERT-Japanese
