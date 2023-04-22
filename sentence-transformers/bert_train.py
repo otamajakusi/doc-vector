@@ -157,6 +157,7 @@ def main(train_dataset, val_dataset, test_dataset):
 
     # ラベルを数値に変換
     label2id = {l: i for i, l in enumerate(set(train_labels))}
+    print(f"{label2id=}")
     train_labels = [label2id[l] for l in train_labels]
     val_labels = [label2id[l] for l in val_labels]
     test_labels = [label2id[l] for l in test_labels]
