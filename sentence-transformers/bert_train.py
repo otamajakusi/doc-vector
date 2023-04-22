@@ -39,7 +39,13 @@ def flat_precision_recall_fscore(preds, labels):
 
 # トレーニング関数
 def train(
-    model, optimizer, train_dataloader, validation_dataloader, test_dataloader, device
+    device,
+    model,
+    optimizer,
+    train_dataloader,
+    validation_dataloader,
+    test_dataloader,
+    output_dir,
 ):
     # ベストなモデルを保存
     best_validation_loss = float("inf")
@@ -124,8 +130,6 @@ def train(
         print(f"F1 score: {f1}")
 
         # 訓練済みモデルを保存する
-        output_dir = "./model_save/"
-
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -151,7 +155,7 @@ def load_dataset(dataset_name):
     return labels, texts
 
 
-def main(train_dataset, val_dataset, test_dataset):
+def main(train_dataset, val_dataset, test_dataset, output_dir):
     # トレーニング、検証、テストセットの読み込み & ラベルと本文を取得
     train_labels, train_texts = load_dataset(train_dataset)
     val_labels, val_texts = load_dataset(val_dataset)
@@ -239,12 +243,13 @@ def main(train_dataset, val_dataset, test_dataset):
     )
 
     train(
+        device,
         model,
         optimizer,
         train_dataloader,
         validation_dataloader,
         test_dataloader,
-        device,
+        output_dir,
     )
 
 
@@ -254,9 +259,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument("--train-txt", help="training dataset")
-    parser.add_argument("--val-txt", help="validation dataset")
-    parser.add_argument("--test-txt", help="test dataset")
+    parser.add_argument("--train-txt", help="training dataset", required=True)
+    parser.add_argument("--val-txt", help="validation dataset", required=True)
+    parser.add_argument("--test-txt", help="test dataset", required=True)
+    parser.add_argument("--output-dir", help="output dir", required=True)
 
     args = parser.parse_args()
-    main(args.train_txt, args.val_txt, args.test_txt)
+    main(args.train_txt, args.val_txt, args.test_txt, args.output_dir)
