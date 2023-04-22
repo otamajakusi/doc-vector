@@ -13,7 +13,10 @@ from transformers import BertJapaneseTokenizer, BertForSequenceClassification, A
 from transformers import get_linear_schedule_with_warmup
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
-from tqdm.notebook import tqdm
+if "JUPYTER_NOTEBOOK" in os.environ:
+    from tqdm.notebook import tqdm
+else:
+    from tqdm import tqdm
 
 
 def load_dataset(dataset_name):
@@ -113,7 +116,7 @@ model = BertForSequenceClassification.from_pretrained(
 model.to(device)
 
 # optimizerの定義
-optimizer = AdamW(model.parameters(), lr=learning_rate, eps=1e-8)
+optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, eps=1e-8)
 
 # エポック数の計算
 total_steps = len(train_dataloader) * num_epochs
