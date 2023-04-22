@@ -13,18 +13,29 @@ def get_sub_dir_files(sub_dir: Path):
     return files
 
 
-TRAIN_TXT = "ldcc_train.txt"
-VAL_TXT = "ldcc_val.txt"
-TEST_TXT = "ldcc_test.txt"
-
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument("--train-txt", help="training dataset", required=True)
+    parser.add_argument("--val-txt", help="validation dataset", required=True)
+    parser.add_argument("--test-txt", help="test dataset", required=True)
+
+    args = parser.parse_args()
+
+    Path(args.train_txt).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.val_txt).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.test_txt).parent.mkdir(parents=True, exist_ok=True)
+
     sub_dirs = get_sub_dirs(Path("text"))
     pa = re.compile(r"[\n\t]")
     train_lines = []
     valid_lines = []
     test_lines = []
-    with open(TRAIN_TXT, "w") as train, open(VAL_TXT, "w") as val, open(
-        TEST_TXT, "w"
+    with open(args.train_txt, "w") as train, open(args.val_txt, "w") as val, open(
+        args.test_txt, "w"
     ) as test:
         for sub_dir in sub_dirs:
             files = get_sub_dir_files(sub_dir)

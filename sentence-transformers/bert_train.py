@@ -3,10 +3,12 @@
 #
 
 import os
+import json
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+from pathlib import Path
 from torch.utils.data import TensorDataset, random_split
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from transformers import BertJapaneseTokenizer, BertForSequenceClassification, AdamW
@@ -130,9 +132,6 @@ def train(
         print(f"F1 score: {f1}")
 
         # 訓練済みモデルを保存する
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
         model_to_save = model.module if hasattr(model, "module") else model
         model_to_save.save_pretrained(output_dir)
         tokenizer.save_pretrained(output_dir)
@@ -155,15 +154,18 @@ def load_dataset(dataset_name):
     return labels, texts
 
 
-def main(train_dataset, val_dataset, test_dataset, output_dir):
+def main(train_dataset, val_dataset, test_dataset, output_dir: Path):
     # トレーニング、検証、テストセットの読み込み & ラベルと本文を取得
     train_labels, train_texts = load_dataset(train_dataset)
     val_labels, val_texts = load_dataset(val_dataset)
     test_labels, test_texts = load_dataset(test_dataset)
 
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     # ラベルを数値に変換
     label2id = {l: i for i, l in enumerate(set(train_labels))}
     print(f"{label2id=}")
+    (output_dir / "label2id.json").write_text(json.dumps(label2id))
     train_labels = [label2id[l] for l in train_labels]
     val_labels = [label2id[l] for l in val_labels]
     test_labels = [label2id[l] for l in test_labels]
@@ -265,4 +267,4 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", help="output dir", required=True)
 
     args = parser.parse_args()
-    main(args.train_txt, args.val_txt, args.test_txt, args.output_dir)
+    main(args.train_txt, args.val_txt, args.test_txt, Path(args.output_dir))
