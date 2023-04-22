@@ -1,6 +1,8 @@
 # 参考
-# [Kaggleで学んだBERTをfine-tuningする際のTips①〜学習効率化編〜] https://www.ai-shift.co.jp/techblog/2138
+# [huggingface/transformers の日本語BERTで文書分類器を作成する] https://qiita.com/nekoumei/items/7b911c61324f16c43e7e
 #
+
+import os
 import numpy as np
 import pandas as pd
 import torch
@@ -10,6 +12,8 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from transformers import BertJapaneseTokenizer, BertForSequenceClassification, AdamW
 from transformers import get_linear_schedule_with_warmup
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+
+from tqdm.notebook import tqdm
 
 
 def load_dataset(dataset_name):
@@ -146,7 +150,7 @@ def train(model, train_dataloader, validation_dataloader):
         total_train_loss = 0
         model.train()
 
-        for step, batch in enumerate(train_dataloader):
+        for step, batch in tqdm(enumerate(train_dataloader)):
             input_ids = batch[0].to(device)
             attention_mask = batch[1].to(device)
             labels = batch[2].to(device)
