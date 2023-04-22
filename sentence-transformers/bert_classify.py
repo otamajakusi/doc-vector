@@ -1,41 +1,38 @@
+# 参考
+# [Kaggleで学んだBERTをfine-tuningする際のTips①〜学習効率化編〜] https://www.ai-shift.co.jp/techblog/2138
+#
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, random_split
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
-from transformers import BertTokenizer, BertForSequenceClassification, AdamW
+from transformers import BertJapaneseTokenizer, BertForSequenceClassification, AdamW
 from transformers import get_linear_schedule_with_warmup
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
-# トレーニング、検証、テストセットの読み込み
-with open("livedoor_news_corpus/text/ldcc_train.txt") as f:
-    train_lines = f.readlines()
 
-with open("livedoor_news_corpus/text/ldcc_val.txt") as f:
-    val_lines = f.readlines()
+def load_dataset(dataset_name):
+    with open(dataset_name) as f:
+        lines = f.readlines()
+    labels = []
+    texts = []
+    for i, line in enumerate(lines):
+        try:
+            label, text = line.strip().split("\t")
+        except Exception as e:
+            print(e)
+            print(f"{i}: {line}")
+            raise
+        labels.append(label)
+        texts.append(text)
+    return labels, texts
 
-with open("livedoor_news_corpus/text/ldcc_test.txt") as f:
-    test_lines = f.readlines()
 
-# ラベルと本文を取得
-train_labels, train_texts = [], []
-for line in train_lines:
-    label, text = line.strip().split("\t")
-    train_labels.append(label)
-    train_texts.append(text)
-
-val_labels, val_texts = [], []
-for line in val_lines:
-    label, text = line.strip().split("\t")
-    val_labels.append(label)
-    val_texts.append(text)
-
-test_labels, test_texts = [], []
-for line in test_lines:
-    label, text = line.strip().split("\t")
-    test_labels.append(label)
-    test_texts.append(text)
+# トレーニング、検証、テストセットの読み込み & ラベルと本文を取得
+train_labels, train_texts = load_dataset("ldcc_train.txt")
+val_labels, val_texts = load_dataset("ldcc_val.txt")
+test_labels, test_texts = load_dataset("ldcc_test.txt")
 
 # ラベルを数値に変換
 label2id = {l: i for i, l in enumerate(set(train_labels))}
@@ -44,12 +41,20 @@ val_labels = [label2id[l] for l in val_labels]
 test_labels = [label2id[l] for l in test_labels]
 
 # トークン化とエンコード
-tokenizer = BertTokenizer.from_pretrained(
+tokenizer = BertJapaneseTokenizer.from_pretrained(
     "cl-tohoku/bert-base-japanese-whole-word-masking"
 )
-train_encodings = tokenizer(train_texts, truncation=True, padding=True)
-val_encodings = tokenizer(val_texts, truncation=True, padding=True)
-test_encodings = tokenizer(test_texts, truncation=True, padding=True)
+
+TOKEN_MAX_LEN = 512
+train_encodings = tokenizer(
+    train_texts, max_length=TOKEN_MAX_LEN, truncation=True, padding=True
+)
+val_encodings = tokenizer(
+    val_texts, max_length=TOKEN_MAX_LEN, truncation=True, padding=True
+)
+test_encodings = tokenizer(
+    test_texts, max_length=TOKEN_MAX_LEN, truncation=True, padding=True
+)
 
 # データセットの作成
 train_dataset = TensorDataset(
@@ -220,3 +225,6 @@ def train(model, train_dataloader, validation_dataloader):
         model_to_save = model.module if hasattr(model, "module") else model
         model_to_save.save_pretrained(output_dir)
         tokenizer.save_pretrained(output_dir)
+
+
+train(model, train_dataloader, validation_dataloader)
