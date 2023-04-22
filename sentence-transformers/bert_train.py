@@ -166,6 +166,9 @@ def main(train_dataset, val_dataset, test_dataset, output_dir: Path):
 
     # ラベルを数値に変換
     label2id = {l: i for i, l in enumerate(set(train_labels))}
+    if (output_dir / "label2id.json").exists():
+        raise Exception(f"{str(output_dir / 'label2id.json')} already exits.")
+
     print(f"{label2id=}")
     (output_dir / "label2id.json").write_text(json.dumps(label2id))
     train_labels = [label2id[l] for l in train_labels]
@@ -207,22 +210,30 @@ def main(train_dataset, val_dataset, test_dataset, output_dir: Path):
         torch.tensor(test_labels),
     )
 
-    # データローダーの作成
-    train_dataloader = DataLoader(
-        train_dataset, sampler=RandomSampler(train_dataset), batch_size=BATCH_SIZE
-    )
-
-    validation_dataloader = DataLoader(
-        val_dataset, sampler=SequentialSampler(val_dataset), batch_size=BATCH_SIZE
-    )
-
-    test_dataloader = DataLoader(
-        test_dataset, sampler=SequentialSampler(test_dataset), batch_size=BATCH_SIZE
-    )
-
     # デバイスの設定
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using {device} device")
+
+    batch_size = BATCH_SIZE
+    if torch.cuda.is_available():
+        device_idx = 0
+        device_props = torch.cuda.get_device_properties(device_idx)
+        gpu_memory = device_props.total_memory
+        batch_size = gpu_memory // (1000 * 1000 * 1000)
+        print(f"GPU Memory: {gpu_memory / 1024 / 1024:.2f} MB, {batch_size=}")
+
+    # データローダーの作成
+    train_dataloader = DataLoader(
+        train_dataset, sampler=RandomSampler(train_dataset), batch_size=batch_size
+    )
+
+    validation_dataloader = DataLoader(
+        val_dataset, sampler=SequentialSampler(val_dataset), batch_size=batch_size
+    )
+
+    test_dataloader = DataLoader(
+        test_dataset, sampler=SequentialSampler(test_dataset), batch_size=batch_size
+    )
 
     # モデルの定義
     model = BertForSequenceClassification.from_pretrained(
