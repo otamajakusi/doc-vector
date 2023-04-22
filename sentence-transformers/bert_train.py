@@ -3,6 +3,7 @@
 #
 
 import os
+import sys
 import json
 import numpy as np
 import pandas as pd
@@ -164,8 +165,8 @@ def main(train_dataset, val_dataset, test_dataset, output_dir: Path):
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # ラベルを数値に変換
-    label2id = {l: i for i, l in enumerate(set(train_labels))}
+    # ラベルを数値に変換(常に同じ順番にするためlabel setを事前にソート)
+    label2id = {l: i for i, l in enumerate(sorted(set(train_labels)))}
     if (output_dir / "label2id.json").exists():
         raise Exception(f"{str(output_dir / 'label2id.json')} already exits.")
 
