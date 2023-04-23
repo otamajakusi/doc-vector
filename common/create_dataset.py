@@ -52,7 +52,9 @@ if __name__ == "__main__":
             # print(f"{train_index=}")
             # print(f"{valid_index=}")
             # print(f"{test_index=}")
-            assert len(set(train_index) & set(valid_index) & set(test_index)) == 0
+            assert len(set(train_index) & set(valid_index)) == 0
+            assert len(set(train_index) & set(test_index)) == 0
+            assert len(set(valid_index) & set(test_index)) == 0
 
             for index in train_index:
                 train.write(f"{sub_dir.name}\t{lines[index]}\n")
