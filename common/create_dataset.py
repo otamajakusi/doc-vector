@@ -46,7 +46,7 @@ if __name__ == "__main__":
             indexes = range(len(lines))
             train_index = random.sample(indexes, int(len(lines) * 0.8))
             rest_index = set(indexes) - set(train_index)
-            valid_index = random.sample(rest_index, int(len(rest_index) * 0.5))
+            valid_index = random.sample(list(rest_index), int(len(rest_index) * 0.5))
             test_index = list(rest_index - set(valid_index))
             # print(f"{'*' * 100}")
             # print(f"{train_index=}")
