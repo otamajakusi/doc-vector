@@ -155,7 +155,9 @@ def evaluate_model(model, dataloader):
     return loss, pearsonr, spearmanr
 
 
-def validate_and_savemodel(model, dataloader, max_valid_spearmanr):
+def validate_and_savemodel(model, dataloader, max_valid_spearmanr, output_dir: Path):
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     loss, pearsonr, spearmanr = evaluate_model(model, dataloader)
     SUMMARY_WRITER.add_scalars(
         "valid",
@@ -167,11 +169,19 @@ def validate_and_savemodel(model, dataloader, max_valid_spearmanr):
         print(
             f"Saved model with spearmanr: {spearmanr:.4f} <- {max_valid_spearmanr:.4f}"
         )
-        torch.save(model.state_dict(), "best_sentence_bert_model.bin")
+        torch.save(model.state_dict(), output_dir / "best_sentence_bert_model.bin")
     return loss, pearsonr, spearmanr
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument("--output-dir", help="output dir", required=True)
+    args = parser.parse_args()
+
     # 開始
     start_time = datetime.now()
     SUMMARY_WRITER = SummaryWriter(log_dir="sentence_bert_experiment")
@@ -206,7 +216,7 @@ if __name__ == "__main__":
             # validation step
             if i % 10 == 0:
                 loss, pearsonr, spearmanr = validate_and_savemodel(
-                    model, valid_dataloader, max_valid_spearmanr
+                    model, valid_dataloader, max_valid_spearmanr, args.output_dir
                 )
                 print(
                     f"[epoch: {epoch}, iter: {i}] loss: {loss:.4f}, pearsonr: {pearsonr:.4f}, spearmanr: {spearmanr:.4f}"
@@ -214,7 +224,9 @@ if __name__ == "__main__":
                 max_valid_spearmanr = max(max_valid_spearmanr, spearmanr)
 
     # モデルのテスト
-    _, _, _ = validate_and_savemodel(model, valid_dataloader, max_valid_spearmanr)
+    _, _, _ = validate_and_savemodel(
+        model, valid_dataloader, max_valid_spearmanr, args.output_dir
+    )
     model.load_state_dict(torch.load("best_sentence_bert_model.bin"))
     loss, pearsonr, spearmanr = evaluate_model(model, test_dataloader)
     print(
