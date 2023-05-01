@@ -1,0 +1,3 @@
+[submodule "sbert-sts/JGLUE"]
+	path = sbert-sts/JGLUE
+	url = https://github.com/yahoojapan/JGLUE.git

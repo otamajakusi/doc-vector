@@ -5,7 +5,7 @@
 ## setup
 
 ```
-git clone https://github.com/yahoojapan/JGLUE
+git submodule update --init
 pip install -r requirements.txt
 ```
 

@@ -216,7 +216,7 @@ if __name__ == "__main__":
             # validation step
             if i % 10 == 0:
                 loss, pearsonr, spearmanr = validate_and_savemodel(
-                    model, valid_dataloader, max_valid_spearmanr, args.output_dir
+                    model, valid_dataloader, max_valid_spearmanr, Path(args.output_dir)
                 )
                 print(
                     f"[epoch: {epoch}, iter: {i}] loss: {loss:.4f}, pearsonr: {pearsonr:.4f}, spearmanr: {spearmanr:.4f}"
@@ -225,7 +225,7 @@ if __name__ == "__main__":
 
     # モデルのテスト
     _, _, _ = validate_and_savemodel(
-        model, valid_dataloader, max_valid_spearmanr, args.output_dir
+        model, valid_dataloader, max_valid_spearmanr, Path(args.output_dir)
     )
     model.load_state_dict(torch.load("best_sentence_bert_model.bin"))
     loss, pearsonr, spearmanr = evaluate_model(model, test_dataloader)
