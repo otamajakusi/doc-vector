@@ -202,7 +202,7 @@ if __name__ == "__main__":
         device_idx = 0
         device_props = torch.cuda.get_device_properties(device_idx)
         gpu_memory = device_props.total_memory
-        batch_size = gpu_memory // (1000 * 1000 * 1000) * 4
+        batch_size = gpu_memory // (1000 * 1000 * 1000 * 8)
         print(f"GPU Memory: {gpu_memory / 1024 / 1024:.2f} MB, {batch_size=}")
 
     train_dataloader, valid_dataloader, test_dataloader = get_data_loaders(
