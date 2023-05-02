@@ -12,7 +12,7 @@ from sentence_bert_experiment import SentenceBert, encode_single_sentences
 
 USE_CUDA = True
 BATCH_SIZE = 64
-MAX_LENGTH = 128
+MAX_LENGTH = 512
 MODEL_NAME = "cl-tohoku/bert-base-japanese-whole-word-masking"
 
 ROOTDIR = Path(__file__).resolve().parent

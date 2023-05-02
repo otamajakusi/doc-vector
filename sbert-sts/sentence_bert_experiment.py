@@ -14,7 +14,7 @@ from typing import Dict, List, Tuple
 
 MODEL_NAME = "cl-tohoku/bert-base-japanese-whole-word-masking"
 BATCH_SIZE = 64
-MAX_LENGTH = 64
+MAX_LENGTH = 512
 NUM_EPOCHS = 10
 USE_CUDA = True
 
